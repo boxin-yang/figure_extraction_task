@@ -3,6 +3,7 @@
 ## Requirements
 
 - Python 2 (2.7.9 is used for development)
+- TODO: Find a suitable DB
 
 ## Overview
 
@@ -10,8 +11,11 @@ The task is to extract values from the graph plot in png files. The data is give
 
 ## Algorithms to extract number
 
+As current library on the Internet cannot properly extract figures for this task, we have to devise an algorithm to extract numbers.
 
+![My image](greed-is-good.github.com/image/2912609_dailybackers.png)
 
+	1. 
 
 ## Contributors:
 - @boxin (a0107354@u.nus.edu)
