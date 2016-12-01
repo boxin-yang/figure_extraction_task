@@ -13,7 +13,7 @@ The task is to extract values from the graph plot in png files. The data is give
 
 As current library on the Internet cannot properly extract figures for this task, we have to devise an algorithm to extract numbers.
 
-![My image](raw.githubusercontent.com/greed-is-good/image/master/2912609_dailybackers.png)
+![My image](https://raw.githubusercontent.com/greed-is-good/image/master/2912609_dailybackers.png)
 
 	1. 
 
