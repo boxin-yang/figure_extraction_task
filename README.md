@@ -62,5 +62,11 @@ There will be two tables for this task.One will record whether a project folder 
 TODO: find out proper Database(PostgreSQL or SQLite)
 TODO: draw EM diagram for two tables
 
+## Run the test
+
+The test for digitReader should be run in the following order:
+	1. python crop_sample.py
+	2. python digitReaderTest.py
+
 ## Contributors:
 - @boxin (a0107354@u.nus.edu)
