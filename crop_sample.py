@@ -1,14 +1,19 @@
 from PIL import Image
 
-"""
+'''This class crops digits from sample images.
 
-This class crops sample.png to obtain images of numbers.
+There are two sample images :sample1.png and sample2.png
+There are 10 digits(0-9) croped from these two images.
+1,2,3 are from sample1.png
+4,5,6,7,8,9,0 are from sample2.png
 
-"""
+each digit is croped into a 10*10 png image in black and white
+each digit is rotated if necessary to be positioned upright
+
+The purpose of this class is to provide sample images for analysis,
+and used to test digitReader class.'''
 
 # extract digit 1, 2, 3 from sample1.png
-# each digit is croped into a 10*10 png image in black and white
-# each digit is rotated if necessary to be positioned upright
 im_sample1 = Image.open("sample1.png")
 
 # crop number 1
