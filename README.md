@@ -37,6 +37,8 @@ As all the numbers are printed within 5 * 5 pixels square with fixed shape, we c
 The first job is to crop out each digit and runs the extraction algorithm on each of them. The end of a digit is identified as a non-black column.(If a vertical pixel column is all non-black, the column marks the end of a digit)
 
 For each digit, we can identify them by looking at its pixel orientation. The pixels are considered to be binary(black pixel and non-black pixel)
+
+
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/0.png)
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/1.png)
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/2.png)
@@ -48,7 +50,8 @@ For each digit, we can identify them by looking at its pixel orientation. The pi
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/8.png)
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/9.png)
 
-We first identify the left upper most black pixel by traversing the pixels. Then identify the digit represented by following flow chart.
+
+We first identify the left upper most black pixel by traversing the pixels. Then identify the digit represented by following flow chart. [x][y] is the most left upper black pixel. 1 represents black pixel and 0 represents non-black pixel.
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/Flow_chart.png)
 
 TODO: After identifying the digit, we might test more pixels to ensure we have correctly identify the digit.
