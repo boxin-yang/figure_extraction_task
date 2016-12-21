@@ -1,5 +1,13 @@
 import numpy
 
+def partition_into_single_digit(arr):
+	'''This function partition a sequence of digits into a list of single digit
+	Args:
+	arr (int): The 2D numpy array to represent the pixel values.
+
+	Returns:
+	int: The digit represented by the pixel
+	'''
 def pixel_array_to_digit(arr):
 	'''This function converts pixel array into corresponding digits
 
@@ -13,7 +21,9 @@ def pixel_array_to_digit(arr):
 	arr (int): The 2D numpy array to represent the pixel values.
 
 	Returns:
-	int: The digit read from the pixels. -1 if the digit cannot be determined.
+	int: The digit read from the pixels.
+		-1 if the digit cannot be determined.
+		-2 if the digit is $.
 
 	Throws:
 		IndexError
@@ -45,13 +55,18 @@ def pixel_array_to_digit(arr):
 	# A flow chart is available on https://github.com/greed-is-good/figure_extraction_task
 
 	if (arr[left_most_x][left_most_y + 1] == 0):
-		# {0,4,6,8,9}
+		# {0,4,6,8,9,$}
 		if (arr[left_most_x + 1][left_most_y] == 0):
-			# {8,9}
-			if (arr[left_most_x + 2][left_most_y] == 0):
-				return 9
-			else :
+			# {8,9,$}
+			if (arr[left_most_x + 2][left_most_y] == 1):
 				return 8
+			else :
+				# {9,$}
+				if (arr[left_most_x][left_most_y + 2] == 0):
+					return 9
+				else :
+					# -2 for $
+					return -2
 
 		else :
 			# {0,4,6}

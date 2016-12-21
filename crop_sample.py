@@ -1,11 +1,12 @@
 from PIL import Image
 
-'''This class crops digits from sample images.
+'''This class crops digits from sample images for digitReaderTest.
 
-There are two sample images :sample1.png and sample2.png
+There are three sample images :sample1.png, sample2.png and sample3.png
 There are 10 digits(0-9) croped from these two images.
 1,2,3 are from sample1.png
 4,5,6,7,8,9,0 are from sample2.png
+$ is cropped from sample3.png
 
 each digit is croped into a 10*10 png image in black and white
 each digit is rotated if necessary to be positioned upright
@@ -92,4 +93,12 @@ digit_pixels = digit_pixels.convert("L")
 digit_pixels = digit_pixels.rotate(270)
 # digit_pixels.show()
 digit_pixels.save("0.png", format='png')
+
+# crop $
+im_sample3 = Image.open("sample3.png")
+digit_pixels = im_sample3.crop((118,135,128,145))
+digit_pixels = digit_pixels.convert("L")
+digit_pixels = digit_pixels.rotate(270)
+digit_pixels.show()
+digit_pixels.save("$.png", format='png')
 

@@ -49,6 +49,7 @@ For each digit, we can identify them by looking at its pixel orientation. The pi
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/7.png)
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/8.png)
 ![My image](https://raw.githubusercontent.com/greed-is-good/image/master/9.png)
+![My image](https://raw.githubusercontent.com/greed-is-good/image/master/$.png)
 
 
 We first identify the left upper most black pixel by traversing the pixels. Then identify the digit represented by following flow chart. [x][y] is the most left upper black pixel. 1 represents black pixel and 0 represents non-black pixel.

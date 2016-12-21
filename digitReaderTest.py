@@ -188,6 +188,24 @@ class digitReaderTest(unittest.TestCase):
 		result = pixel_array_to_digit(binary_pixel)
 		self.assertEqual(result, expectedValue)	
 
+	def test_digit_dollar_sign(self):
+		fileName = "$.png"
+		expectedValue = -2
+
+		im = Image.open(fileName)
+		im = im.convert("L")
+		pixel = im.load()
+
+		binary_pixel = np.zeros((im.size[0],im.size[1]))
+
+		for y in range(im.size[1]):
+			for x in range(im.size[0]):
+				if (pixel[x,y] == 0) :
+					binary_pixel[y][x] = 1
+
+		result = pixel_array_to_digit(binary_pixel)
+		self.assertEqual(result, expectedValue)	
+
 if __name__ == '__main__':
 	unittest.main()
 
