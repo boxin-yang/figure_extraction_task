@@ -1,13 +1,107 @@
 import numpy
 
-def partition_into_single_digit(arr):
-	'''This function partition a sequence of digits into a list of single digit
+is_debug_on = False
+
+def read_digit_sequence(arr):
+	'''This function reads a list of single digit
+
+	The function scans the pixels column by column to partition digits. Each single digit starts
+	with a column containing black pixel and ends with a column containing no black pixel. Then the
+	function reads each digit to return the digit represented.
+
 	Args:
 	arr (int): The 2D numpy array to represent the pixel values.
 
 	Returns:
 	int: The digit represented by the pixel
+	-1 for error.
 	'''
+
+	if is_debug_on :
+		print("\nread_digit_sequence with param:\n")
+		# print(arr)
+		print("\nsize of param:\n")
+		print(arr.shape)
+
+	# Each digit read from the pixels
+	result = []
+
+	# The column been scanned right now
+	current_column = 0
+
+	# Starting and ending column of a digit, reset to -1 after find a digit
+	starting_column = -1
+	ending_column = -1
+
+	while(current_column < arr.shape[1]) :
+		if is_debug_on :
+			print("read_digit_sequence: line 36 , current_column is ", current_column)
+
+		while(starting_column == -1 and current_column < arr.shape[1]) :
+			has_one = False
+			for i in range(arr.shape[0]):
+				if (arr[i][current_column] == 1):
+					has_one = True
+					break
+
+			if has_one :
+				starting_column = current_column
+
+			current_column += 1
+
+		if is_debug_on :
+			print("read_digit_sequence: line 51 , current_column is ", current_column)
+
+		while(ending_column == -1 and current_column < arr.shape[1]) :
+			has_no_one = True
+			for i in range(arr.shape[0]):
+				if (arr[i][current_column] == 1):
+					has_no_one = False
+					break
+
+			if has_no_one :
+				ending_column = current_column
+
+			current_column += 1
+
+		if is_debug_on :
+			print("read_digit_sequence: line 66 , current_column is ", current_column)
+
+		if (starting_column == -1):
+			continue
+
+		if (ending_column == -1):
+			ending_column = arr.shape[1] - 1
+
+		temp = numpy.zeros((arr.shape[0], ending_column - starting_column + 1))
+
+		for x in range(arr.shape[0]):
+			for y in range(temp.shape[1]):
+				temp[x][y] = arr[x][starting_column + y]
+
+		digit = pixel_array_to_digit(temp)
+
+		if (digit == -1) :
+			print("Error: pixel_array_to_digit returns -1")
+			return -1
+
+		result.append(digit)
+		starting_column = -1
+		ending_column = -1
+
+	final_result = 0
+
+	if is_debug_on :
+		print("read_digit_sequence: adding up final result, count ", len(result))
+
+	for x in range(len(result)):
+		if is_debug_on :
+			print("adding : ", result[x] * (10 ** (len(result) - x - 1)))
+		final_result += result[x] * (10 ** (len(result) - x - 1))
+
+	return final_result
+
+
 def pixel_array_to_digit(arr):
 	'''This function converts pixel array into corresponding digits
 
@@ -19,11 +113,11 @@ def pixel_array_to_digit(arr):
 	
 	Args:
 	arr (int): The 2D numpy array to represent the pixel values.
-
+	arr[row][column] is the pixel values at that row and column
 	Returns:
 	int: The digit read from the pixels.
 		-1 if the digit cannot be determined.
-		-2 if the digit is $.
+		0 if the digit is $.(for computational convenience)
 
 	Throws:
 		IndexError
@@ -66,7 +160,7 @@ def pixel_array_to_digit(arr):
 					return 9
 				else :
 					# -2 for $
-					return -2
+					return 0
 
 		else :
 			# {0,4,6}

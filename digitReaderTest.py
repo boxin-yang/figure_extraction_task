@@ -1,13 +1,32 @@
 from PIL import Image
 import numpy as np
-from digitReader import pixel_array_to_digit
+from digitReader import *
 import unittest
 """
-	This class test pixel_array_to_digit in digitReader
+	This class test digitReader
 """
 
 class digitReaderTest(unittest.TestCase):
 
+	# Test read_digit_sequence
+	def test_read_digit_sequence(self):
+		fileName = "$75.png"
+		expectedValue = 75
+
+		im = Image.open(fileName)
+		im = im.convert("L")
+		pixel = im.load()
+		binary_pixel = np.zeros((im.size[1],im.size[0]))
+
+		for y in range(im.size[0]):
+			for x in range(im.size[1]):
+				if (pixel[y,x] == 0) :
+					binary_pixel[x][y] = 1
+
+		result = read_digit_sequence(binary_pixel)
+		self.assertEqual(result, expectedValue)
+
+	# The following test pixel_array_to_digit
 	def test_digit_0(self):
 		fileName = "0.png"
 		expectedValue = 0
@@ -190,7 +209,7 @@ class digitReaderTest(unittest.TestCase):
 
 	def test_digit_dollar_sign(self):
 		fileName = "$.png"
-		expectedValue = -2
+		expectedValue = 0
 
 		im = Image.open(fileName)
 		im = im.convert("L")

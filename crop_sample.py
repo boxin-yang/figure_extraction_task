@@ -99,6 +99,14 @@ im_sample3 = Image.open("sample3.png")
 digit_pixels = im_sample3.crop((118,135,128,145))
 digit_pixels = digit_pixels.convert("L")
 digit_pixels = digit_pixels.rotate(270)
-digit_pixels.show()
+# digit_pixels.show()
 digit_pixels.save("$.png", format='png')
+
+# extract $75 from sample3.png
+digit_pixels = im_sample3.crop((110,120,140,150))
+digit_pixels = digit_pixels.convert("L")
+digit_pixels = digit_pixels.rotate(270)
+digit_pixels.show()
+digit_pixels.save("$75.png", format='png')
+
 
