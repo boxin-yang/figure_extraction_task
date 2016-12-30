@@ -1,7 +1,7 @@
 import numpy
 from PIL import Image
 
-is_debug_on = True
+is_debug_on = False
 
 def read_image(image_name):
 	'''This function reads a graph plot.
@@ -90,10 +90,10 @@ def read_image(image_name):
 		data = read_column(x, column_distance, horizontal_axis, pixels)
 		graph_data.append(data)
 
-	if is_debug_on:
+	if True:
 		print("Data read for each column is (column, data)")
 		for x in range (len(graph_data)):
-			print(x, graph_data[x])
+			print(x + 1, graph_data[x])
 
 
 def read_column(col, column_distance, horizontal_axis, pixels):
@@ -114,7 +114,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	if is_debug_on:
 		print("read_column: first_black_pixel found is at row", first_black_pixel)
 
-	# from this first black pixel find the crop that 
+	# from this first black pixel find the crop that contains the digit
 	upper = -1
 	lower = -1
 	left = -1
@@ -150,12 +150,12 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			continue
 
 		upper = curr_row
-		# print("upper ", upper)
 		break
 
 	# find lower
 	curr_row = first_black_pixel + 1
 	while (curr_row < horizontal_axis) :
+		# print("curr_row", curr_row)
 		if(pixels[col, curr_row] == 0):
 			curr_row += 1
 			continue
@@ -176,19 +176,20 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		# Do not check for more columns as first black pixel is close to horizontal axis
 		# Alternatively, we can take horizontal aixs as lower
 		lower = curr_row
-		# print("lower ", lower)
 		break
 
 	middle = (upper + lower) / 2
-	
+	if is_debug_on:
+		print("read_column upper, lower, middle", upper, lower, middle)
+
 	# find left
 	curr_column = col - 1
 	while (col - curr_column < (column_distance / 2)) :
 		# use 3 points for efficient testing
-		if(pixels[curr_column, upper] == 0
-		   or pixels[curr_column, lower] == 0
+		if(pixels[curr_column, upper + 1] == 0
+		   or pixels[curr_column, lower - 1] == 0
 		   or pixels[curr_column, middle] == 0):
-			curr_row -= 1
+			curr_column -= 1
 			continue
 
 		has_no_black_pixel = True
@@ -205,17 +206,15 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			break
 		else:
 			curr_column -= 1
-	
-	print("left", left)
-	
+		
 	# find right
 	curr_column = col + 1
 	while (curr_column - col < (column_distance / 2)) :
 		# use 3 points for efficient testing
-		if(pixels[curr_column, upper] == 0
-		   or pixels[curr_column, lower] == 0
+		if(pixels[curr_column, upper + 1] == 0
+		   or pixels[curr_column, lower - 1] == 0
 		   or pixels[curr_column, middle] == 0):
-			curr_row += 1
+			curr_column += 1
 			continue
 
 		has_no_black_pixel = True
@@ -228,11 +227,11 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 					break
 				
 		if has_no_black_pixel:
-			left = curr_column
+			right = curr_column
 			break
 		else:
 			curr_column += 1
-
+	
 	if is_debug_on:
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
 	return 0
