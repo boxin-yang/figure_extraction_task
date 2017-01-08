@@ -106,7 +106,13 @@ digit_pixels.save("$.png", format='png')
 digit_pixels = im_sample3.crop((110,120,140,150))
 digit_pixels = digit_pixels.convert("L")
 digit_pixels = digit_pixels.rotate(270)
-digit_pixels.show()
+# digit_pixels.show()
 digit_pixels.save("$75.png", format='png')
 
+# crop - sign from sample4
+im_sample4 = Image.open("sample4.tiff")
+digit_pixels = im_sample4.crop((168, 213, 173, 218))
+digit_pixels = digit_pixels.convert("L")
+# digit_pixels.show()
+digit_pixels.save("-.png", format='png')
 

@@ -1,6 +1,6 @@
 import numpy
 
-is_debug_on = False
+is_debug_on = True
 
 def read_digit_sequence(arr):
 	'''This function reads a list of single digit
@@ -101,6 +101,176 @@ def read_digit_sequence(arr):
 
 	return final_result
 
+def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
+	'''This function verifies whether the digit returned by pixel_array_to_digit is correct.
+
+	The function checks all expected black pixels to verify the reading.If the digit
+	read is wrong, return -1
+
+	Args:
+	arr(int):The 2D numpy array to represent the pixel values.
+	arr[row][column] is the pixel values at that row and column
+	digit(int): digit read by pixel pixel_array_to_digit
+	left_most_x: row number of left upper most black pixel
+	left_most_x: column number of left upper most black pixel
+
+	Returns:
+	int: digit if read correctly, else return -1
+	'''
+
+	if is_debug_on:
+		print("verify_digit_pixels is called with param (arr, digit, left_most_x, left_most_y)")
+		print(arr, digit, left_most_x, left_most_y)
+
+	if(digit == 1):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 4][left_most_y + 1] == 1):
+			return 1
+
+	if(digit == 2):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y + 1] == 1
+		   and arr[left_most_x + 4][left_most_y + 2] == 1
+		   and arr[left_most_x + 4][left_most_y + 3] == 1):
+			return 2
+
+	if(digit == 3):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1
+		   and arr[left_most_x + 4][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y + 1] == 1
+		   and arr[left_most_x + 4][left_most_y + 2] == 1):
+			return 3
+
+	if(digit == 4):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1
+		   and arr[left_most_x + 4][left_most_y + 3] == 1):
+			return 4
+
+	if(digit == 5):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1
+		   and arr[left_most_x + 4][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y + 1] == 1
+		   and arr[left_most_x + 4][left_most_y + 2] == 1):
+			return 5
+
+	if(digit == 6):
+		if(arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1):
+			return 6
+
+	if(digit == 7):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 4][left_most_y + 1] == 1):
+			return 7
+
+	if(digit == 8):
+		if(arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1):
+			return 8
+
+	if(digit == 9):
+		if(arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1):
+			return 9
+
+	if(digit == 0):
+		if(arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1):
+			return 0
+
+	# -2 for $
+	if(digit == -2):
+		if(arr[left_most_x - 2][left_most_y + 2] == 1
+		   and arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x - 1][left_most_y + 3] == 1
+		   and arr[left_most_x - 1][left_most_y + 4] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y + 4] == 1
+		   and arr[left_most_x + 3][left_most_y] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1
+		   and arr[left_most_x + 4][left_most_y + 2] == 1):
+			return 0
+
+	return -1
 
 def pixel_array_to_digit(arr):
 	'''This function converts pixel array into corresponding digits
@@ -124,6 +294,11 @@ def pixel_array_to_digit(arr):
 
 	'''
 
+	if is_debug_on:
+		print("pixel_array_to_digit is called with param (arr)")
+		for x in range (arr.shape[0]):
+			print(arr[x])
+
 	# A valid pixel has at least 5 rows, 2 coloums
 	if (arr.shape[1] < 5 or arr.shape[0] < 2) :
 		print("pixel_array_to_digit with param ", arr, ": invalid input dimensions")
@@ -145,6 +320,11 @@ def pixel_array_to_digit(arr):
 		if left_most_y != -1:
 			break
 
+	if (left_most_x == -1 or left_most_y == -1):
+		print("pixel_array_to_digit cannot find black pixel with arr")
+		print(arr)
+		return -1
+
 	# Use a decision tree to decide on the digit represented
 	# A flow chart is available on https://github.com/greed-is-good/figure_extraction_task
 
@@ -153,46 +333,46 @@ def pixel_array_to_digit(arr):
 		if (arr[left_most_x + 1][left_most_y] == 0):
 			# {8,9,$}
 			if (arr[left_most_x + 2][left_most_y] == 1):
-				return 8
+				return verify_digit_pixels(arr, 8, left_most_x, left_most_y)
 			else :
 				# {9,$}
 				if (arr[left_most_x][left_most_y + 2] == 0):
-					return 9
+					return verify_digit_pixels(arr, 9, left_most_x, left_most_y)
 				else :
-					# -2 for $
-					return 0
+					# 0 for $
+					return verify_digit_pixels(arr, -2, left_most_x, left_most_y)
 
 		else :
 			# {0,4,6}
 			if (arr[left_most_x][left_most_y + 3] == 0):
-				return 6
+				return verify_digit_pixels(arr, 6, left_most_x, left_most_y)
 			else :
 				# {0,4}
 				if(arr[left_most_x + 2][left_most_y + 1] == 0):
-					return 0
+					return verify_digit_pixels(arr, 0, left_most_x, left_most_y)
 				else :
-					return 4
+					return verify_digit_pixels(arr, 4, left_most_x, left_most_y)
 
 	else :
 		# {1,2,3,5,7}
 		if (arr[left_most_x + 4][left_most_y] == 0):
 			# {1,7}
 			if (arr[left_most_x + 1][left_most_y + 1] == 0):
-				return 7
+				return verify_digit_pixels(arr, 7, left_most_x, left_most_y)
 			else :
-				return 1
+				return verify_digit_pixels(arr, 1, left_most_x, left_most_y)
 
 		else:
 			# {2,3,5}
 			if (arr[left_most_x + 1][left_most_y] == 0):
 				# {2,3}
 				if (arr[left_most_x + 3][left_most_y] == 0):
-					return 3
+					return verify_digit_pixels(arr, 3, left_most_x, left_most_y)
 				else :
-					return 2
+					return verify_digit_pixels(arr, 2, left_most_x, left_most_y)
 
 			else:
-				return 5
+				return verify_digit_pixels(arr, 5, left_most_x, left_most_y)
 
 
 

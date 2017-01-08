@@ -26,6 +26,7 @@ class digitReaderTest(unittest.TestCase):
 		result = read_digit_sequence(binary_pixel)
 		self.assertEqual(result, expectedValue)
 
+	
 	# The following test pixel_array_to_digit
 	def test_digit_0(self):
 		fileName = "0.png"
@@ -35,7 +36,7 @@ class digitReaderTest(unittest.TestCase):
 		im = im.convert("L")
 		pixel = im.load()
 
-		binary_pixel = np.zeros((im.size[0],im.size[1]))
+		binary_pixel = np.zeros((im.size[1],im.size[0]))
 
 		for y in range(im.size[1]):
 			for x in range(im.size[0]):
@@ -44,7 +45,7 @@ class digitReaderTest(unittest.TestCase):
 
 		result = pixel_array_to_digit(binary_pixel)
 		self.assertEqual(result, expectedValue)	
-
+	
 	def test_digit_1(self):
 		fileName = "1.png"
 		expectedValue = 1
