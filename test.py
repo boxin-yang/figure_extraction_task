@@ -2,10 +2,16 @@ from PIL import Image
 import numpy
 from pytesseract import *
 from imageReader import *
-im = Image.open("sample4.tiff")
-im = im.convert("L")
-im = im.crop((168, 213, 173, 218))
-im.show()
+
+# im = Image.open("sample1.png")
+# im = im.convert("L")
+# pix = im.load()
+# print(pix[187, 114])
+# print(pix[187, 115])
+
+# im = im.crop((113, 186, 119, 189))
+# print(im.size)
+# im.show()
 # print(im.size)
 # pix = im.load()
 # for y in range(im.size[1]):

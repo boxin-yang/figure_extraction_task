@@ -1,20 +1,23 @@
 import numpy
 from PIL import Image
+from digitReader import read_digit_sequence
 
 is_debug_on = False
+error_return = -100000
 
 def read_image(image_name):
 	'''This function reads a graph plot.
 
 	'''
-
-	if is_debug_on:
-		print("read_image is called with file name ", image_name)
-
+	
+	# Load the image
 	im = Image.open(image_name)
 	im = im.convert("L")
-
 	pixels = im.load()
+	
+	if is_debug_on:
+		print("read_image is called with file name ", image_name)
+		print("dimension", im.size)
 
 	middle_coloum = im.size[0] / 2
 	middle_row = im.size[1] / 2
@@ -33,11 +36,12 @@ def read_image(image_name):
 			if (pixels[current_column, middle_row + x] == 0):
 				black_pixel_count += 1
 
-		if (black_pixel_count > 55) :
+		if (black_pixel_count > 50) :
 			# found the axis
 			vertical_axis = current_column
 		else :
 			current_column += 1
+	
 	if is_debug_on:
 		print("vertical axis is at ", vertical_axis)
 
@@ -55,7 +59,7 @@ def read_image(image_name):
 			if (pixels[middle_coloum + x, current_row] == 0):
 				black_pixel_count += 1
 
-		if (black_pixel_count > 55) :
+		if (black_pixel_count > 50) :
 			# found the axis
 			horizontal_axis = current_row
 		else :
@@ -65,7 +69,11 @@ def read_image(image_name):
 		print("horizontal axis is at ", horizontal_axis)
 
 
-	# scan for all columns
+	if (vertical_axis == -1 or horizontal_axis == -1):
+		print("Error: cannot find axis")
+		return
+	# scan for all columns in the graph
+	# this is done by scanning the pixel row below horizontal axis
 	current_column = vertical_axis
 
 	graph_columns = []
@@ -77,39 +85,57 @@ def read_image(image_name):
 		current_column += 1
 	
 	if is_debug_on:
-		print("found following columns in the graph ", len(graph_columns))
+		print("found following number of columns in the graph ", len(graph_columns))
 
+	# column_distance is used in read_column to avoid unexpected reading beyond column
 	if (len(graph_columns) > 1):
 		column_distance = graph_columns[1] - graph_columns[0] 
 	else :
 		column_distance = graph_columns[0] - vertical_axis
 	
+	if is_debug_on:
+		print(graph_columns)
+		print("column distance is", column_distance)
+	
 	graph_data = []
+	
+	has_error = False
 
 	for x in graph_columns:
 		data = read_column(x, column_distance, horizontal_axis, pixels)
 		graph_data.append(data)
+		if (data == error_return) :
+			has_error = True
 
+	if has_error:
+		print("Error: pixel_array_to_digit returns error_return")
+	
 	if True:
-		print("Data read for each column is (column, data)")
+		print(image_name, "Data read for each column is (column, data)")
 		for x in range (len(graph_data)):
 			print(x + 1, graph_data[x])
-
+	
 
 def read_column(col, column_distance, horizontal_axis, pixels):
-	'''This function reads the data of the column
+	'''This function reads the data of the column in the graph
 	'''
 	if is_debug_on:
-		print("read_column called with param", col, column_distance, horizontal_axis)
+		print("read_column called with param: col, column_distance, horizontal_axis", col, column_distance, horizontal_axis)
+	
+	# Find the first black pixel above the vertical axis
 	curr_row = horizontal_axis - 1
 	first_black_pixel = -1
 
-	while (curr_row > 0):
+	while (curr_row > 50):
 		if (pixels[col, curr_row] != 0):
 			curr_row -= 1
 		else :
 			first_black_pixel = curr_row
 			break
+
+	# cannot find the digit
+	if read_column <= 50:
+		return error_return
 
 	if is_debug_on:
 		print("read_column: first_black_pixel found is at row", first_black_pixel)
@@ -234,7 +260,29 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	
 	if is_debug_on:
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
-	return 0
+
+	pixels_arr = numpy.zeros((lower - upper + 1, right - left + 1))
+
+	for x in range (pixels_arr.shape[0]):
+		for y in range(pixels_arr.shape[1]):
+			if(pixels[left + y,upper + x] == 0):
+				pixels_arr[x][y] = 1
+	
+	try_with_original_pixel = read_digit_sequence(pixels_arr)
+	if(try_with_original_pixel !=error_return):
+		return try_with_original_pixel
+
+	pixels_arr_rotate = numpy.zeros((pixels_arr.shape[1], pixels_arr.shape[0]))
+
+	height = pixels_arr.shape[0] - 1
+
+	for x in range (pixels_arr.shape[0]):
+		for y in range(pixels_arr.shape[1]):
+			if(pixels_arr[x][y] == 1):
+				pixels_arr_rotate[y][height - x] = 1
+	
+	try_with_rotated_pixel = read_digit_sequence(pixels_arr_rotate)
+	return try_with_rotated_pixel
 
 
 
