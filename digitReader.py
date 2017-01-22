@@ -2,6 +2,10 @@ import numpy
 
 is_debug_on = False
 error_return = -100000
+dollar_sign_return_value = -2
+negative_sign_return_value = -3
+comma_return_value = -4
+pound_return_value = -5
 
 def read_digit_sequence(arr):
 	'''This function reads a list of single digit
@@ -27,23 +31,27 @@ def read_digit_sequence(arr):
 	# Each digit read from the pixels
 	result = []
 
+	# First scan the pixel columns to distinguish each digit from each other
+	# Each digit should be separated by a non black column
 	# The column been scanned right now
 	current_column = 0
 
 	# Starting and ending column of a digit, reset to -1 after find a digit
 	starting_column = -1
 	ending_column = -1
+	
+	# Used to mark the - sign read
 	is_negative = False
 
 	while(current_column < arr.shape[1]) :
 		while(starting_column == -1 and current_column < arr.shape[1]) :
-			has_one = False
+			has_black_pixel = False
 			for i in range(arr.shape[0]):
 				if (arr[i][current_column] == 1):
-					has_one = True
+					has_black_pixel = True
 					break
 
-			if has_one :
+			if has_black_pixel :
 				starting_column = current_column
 
 			current_column += 1
@@ -56,17 +64,18 @@ def read_digit_sequence(arr):
 			break
 
 		while(ending_column == -1 and current_column < arr.shape[1]) :
-			has_no_one = True
+			has_no_black_pixel = True
 			for i in range(arr.shape[0]):
 				if (arr[i][current_column] == 1):
-					has_no_one = False
+					has_no_black_pixel = False
 					break
 
-			if has_no_one :
+			if has_no_black_pixel :
 				ending_column = current_column
 
 			current_column += 1
 
+		# The last digit in the sequence
 		if (ending_column == -1):
 			ending_column = arr.shape[1] - 1
 
@@ -79,16 +88,21 @@ def read_digit_sequence(arr):
 			for y in range(temp.shape[1]):
 				temp[x][y] = arr[x][starting_column + y]
 
-		digit = pixel_array_to_digit(temp)
-
+		try:
+			digit = pixel_array_to_digit(temp)
+		except IndexError:
+			digit = error_return
+		
 		if (digit == error_return) :
 			return error_return
 		
-		if (digit == -3):
+		if (digit == negative_sign_return_value):
 			is_negative = True
 		else:
-			result.append(digit)
+			if (digit != comma_return_value):
+				result.append(digit)
 		
+		# search for next digit
 		starting_column = -1
 		ending_column = -1
 
@@ -259,8 +273,8 @@ def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
 		   and arr[left_most_x + 3][left_most_y + 2] == 1):
 			return 0
 
-	# -2 for $
-	if(digit == -2):
+	# dollar_sign_return_value for $
+	if(digit == dollar_sign_return_value):
 		if(arr[left_most_x - 2][left_most_y + 2] == 1
 		   and arr[left_most_x - 1][left_most_y + 1] == 1
 		   and arr[left_most_x - 1][left_most_y + 2] == 1
@@ -278,6 +292,22 @@ def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
 		   and arr[left_most_x + 3][left_most_y + 2] == 1
 		   and arr[left_most_x + 3][left_most_y + 3] == 1
 		   and arr[left_most_x + 4][left_most_y + 2] == 1):
+			return 0
+
+	# dollar_sign_return_value for pound sign
+	if(digit == pound_return_value):
+		if(arr[left_most_x - 2][left_most_y + 2] == 1
+		   and arr[left_most_x - 2][left_most_y + 3] == 1
+		   and arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y ] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y + 3] == 1):
 			return 0
 
 	return error_return
@@ -298,7 +328,7 @@ def pixel_array_to_digit(arr):
 	int: The digit read from the pixels.
 		error_return if the digit cannot be determined.
 		0 if the digit is $.(for computational convenience)
-		-3 for - sign
+		negative_sign_return_value for - sign
 
 	Throws:
 		IndexError
@@ -330,21 +360,30 @@ def pixel_array_to_digit(arr):
 			break
 
 	if (left_most_x == -1 or left_most_y == -1):
-		print("pixel_array_to_digit cannot find black pixel with arr")
-		print(arr)
+		if is_debug_on:
+			print("pixel_array_to_digit cannot find black pixel with arr")
+			print(arr)
 		return error_return
 
 	# Test for - sign
 	# TODO: think of a better way to place the code
-	if(arr.shape[1] > 2
+	if(arr.shape[1] - left_most_y > 2
 	   and arr[left_most_x][left_most_y + 1] == 1
 	   and arr[left_most_x][left_most_y + 2] == 1):
 		if (arr.shape[0] - left_most_x < 2
 		    or arr[left_most_x + 2][left_most_y + 2] == 0):
-			return -3
+			return negative_sign_return_value
 	
+	# Test for "," mark
+	if(left_most_x > 0 
+	   and arr[left_most_x - 1][left_most_y + 1] == 1):
+		if(arr.shape[1] - left_most_y < 3
+		   or (arr[left_most_x - 1][left_most_y + 2] == 0 and arr[left_most_x][left_most_y + 1] == 0)):
+			return comma_return_value
+
 	# A valid digit or $ pixel has at least 5 rows, 2 coloums
-	if (arr.shape[1] < 2 or arr.shape[0] < 5) :
+	# Quite test for wrong orientation
+	if (arr.shape[1] - left_most_y < 2 or arr.shape[0] - left_most_x < 5) :
 		# print("pixel_array_to_digit with param ", arr, ": invalid input dimensions")
 		return error_return
 
@@ -363,7 +402,7 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, 9, left_most_x, left_most_y)
 				else :
 					# 0 for $
-					return verify_digit_pixels(arr, -2, left_most_x, left_most_y)
+					return verify_digit_pixels(arr, dollar_sign_return_value, left_most_x, left_most_y)
 
 		else :
 			# {0,4,6}
@@ -377,7 +416,10 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, 4, left_most_x, left_most_y)
 
 	else :
-		# {1,2,3,5,7}
+		# {1,2,3,5,7, pound}
+		if (left_most_x > 0 and arr[left_most_x - 1][left_most_y + 1] == 1):
+			return verify_digit_pixels(arr, pound_return_value, left_most_x, left_most_y)
+		
 		if (arr[left_most_x + 4][left_most_y] == 0):
 			# {1,7}
 			if (arr[left_most_x + 1][left_most_y + 1] == 0):

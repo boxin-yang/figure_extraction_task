@@ -10,7 +10,11 @@ class imageReaderTest(unittest.TestCase):
 
 	# Test read_digit_sequence
 	def test_read_axis(self):
-		read_image("sample1.png")
+		im1_reading = read_image("sample1.png")
+		expected_reading_im1 = [2, 1, 0, 1, 1, 1, 0, 2, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 3, 0]
+		self.assertEqual(im1_reading, expected_reading_im1)
+		
+
 		# read_image("sample2.png")
 		# read_image("sample3.png")
 		# read_image("sample4.png")

@@ -13,7 +13,7 @@ each digit is rotated if necessary to be positioned upright
 
 The purpose of this class is to provide sample images for analysis,
 and used to test digitReader class.'''
-
+'''
 # extract digit 1, 2, 3 from sample1.png
 im_sample1 = Image.open("sample1.png")
 
@@ -115,4 +115,13 @@ digit_pixels = im_sample4.crop((168, 213, 173, 218))
 digit_pixels = digit_pixels.convert("L")
 # digit_pixels.show()
 digit_pixels.save("-.png", format='png')
+
+# crop pound sign from sample5
+im_sample5 = Image.open("sample5.png")
+digit_pixels = im_sample5.crop((789, 130, 799, 140))
+digit_pixels = digit_pixels.convert("L")
+digit_pixels = digit_pixels.rotate(270)
+# digit_pixels.show()
+digit_pixels.save("pound.png", format='png')
+'''
 

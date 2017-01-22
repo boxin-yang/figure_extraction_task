@@ -3,6 +3,11 @@ import numpy
 from pytesseract import *
 from imageReader import *
 
+try:
+	list = []
+	list[5] = 1
+except IndexError:
+	print("exception caught")
 # im = Image.open("sample1.png")
 # im = im.convert("L")
 # pix = im.load()

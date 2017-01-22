@@ -110,11 +110,12 @@ def read_image(image_name):
 	if has_error:
 		print("Error: pixel_array_to_digit returns error_return")
 	
-	if True:
+	if is_debug_on :
 		print(image_name, "Data read for each column is (column, data)")
 		for x in range (len(graph_data)):
 			print(x + 1, graph_data[x])
-	
+
+	return graph_data
 
 def read_column(col, column_distance, horizontal_axis, pixels):
 	'''This function reads the data of the column in the graph
@@ -123,7 +124,9 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		print("read_column called with param: col, column_distance, horizontal_axis", col, column_distance, horizontal_axis)
 	
 	# Find the first black pixel above the vertical axis
-	curr_row = horizontal_axis - 1
+	# Start searching 3 pixels above the axis to avoid searching axis label
+	# TODO: consider searching from col + 1 to avoid searching axis label
+	curr_row = horizontal_axis - 3
 	first_black_pixel = -1
 
 	while (curr_row > 50):
@@ -134,7 +137,10 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			break
 
 	# cannot find the digit
+	# 50 is hard coded value, might need to be changed if found exceptions
 	if read_column <= 50:
+		# 0 value is not printed on some graphs
+		# TODO: add in checking for 0
 		return error_return
 
 	if is_debug_on:
@@ -146,6 +152,10 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	left = -1
 	right = -1
 
+	# if first black pixel is close to horizontal axis, just take horizontal_axis - 1 as the lower bound
+	if (horizontal_axis - first_black_pixel < 10):
+		lower = horizontal_axis - 1
+	
 	# find upper
 	curr_row = first_black_pixel
 	while (curr_row > 0) :
@@ -179,30 +189,29 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		break
 
 	# find lower
-	curr_row = first_black_pixel + 1
-	while (curr_row < horizontal_axis) :
-		# print("curr_row", curr_row)
-		if(pixels[col, curr_row] == 0):
-			curr_row += 1
-			continue
+	if lower == -1 :
+		curr_row = first_black_pixel + 1
+		while (curr_row < horizontal_axis) :
+			# print("curr_row", curr_row)
+			if(pixels[col, curr_row] == 0):
+				curr_row += 1
+				continue
 
-		# If the row has more black pixel, not finished yet
-		if (pixels[col - 4, curr_row] == 0
-			or pixels[col - 3, curr_row] == 0
-			or pixels[col - 2, curr_row] == 0
-			or pixels[col - 1, curr_row] == 0
-			or pixels[col + 1, curr_row] == 0
-			or pixels[col + 2, curr_row] == 0
-			or pixels[col + 3, curr_row] == 0
-			or pixels[col + 3, curr_row] == 0
-			):
-			curr_row += 1
-			continue
+			# If the row has more black pixel, not finished yet
+			if (pixels[col - 4, curr_row] == 0
+				or pixels[col - 3, curr_row] == 0
+				or pixels[col - 2, curr_row] == 0
+				or pixels[col - 1, curr_row] == 0
+				or pixels[col + 1, curr_row] == 0
+				or pixels[col + 2, curr_row] == 0
+				or pixels[col + 3, curr_row] == 0
+				or pixels[col + 3, curr_row] == 0
+				):
+				curr_row += 1
+				continue
 
-		# Do not check for more columns as first black pixel is close to horizontal axis
-		# Alternatively, we can take horizontal aixs as lower
-		lower = curr_row
-		break
+			lower = curr_row
+			break
 
 	middle = (upper + lower) / 2
 	if is_debug_on:
@@ -210,7 +219,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 
 	# find left
 	curr_column = col - 1
-	while (col - curr_column < (column_distance / 2)) :
+	while (col - curr_column < column_distance) :
 		# use 3 points for efficient testing
 		if(pixels[curr_column, upper + 1] == 0
 		   or pixels[curr_column, lower - 1] == 0
@@ -224,7 +233,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 				break
 			for y in range(upper, lower + 1):
 				if (pixels[curr_column - x, y] == 0):
-					has_no_black_pixel == False
+					has_no_black_pixel = False
 					break
 				
 		if has_no_black_pixel:
@@ -235,7 +244,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		
 	# find right
 	curr_column = col + 1
-	while (curr_column - col < (column_distance / 2)) :
+	while (curr_column - col < column_distance) :
 		# use 3 points for efficient testing
 		if(pixels[curr_column, upper + 1] == 0
 		   or pixels[curr_column, lower - 1] == 0
@@ -249,7 +258,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 				break
 			for y in range(upper, lower + 1):
 				if (pixels[curr_column + x, y] == 0):
-					has_no_black_pixel == False
+					has_no_black_pixel = False
 					break
 				
 		if has_no_black_pixel:
@@ -261,17 +270,25 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	if is_debug_on:
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
 
+	# if cropping goes to another column, high chance of reading overlap
+	if (col - left == column_distance or curr_column - right == column_distance):
+		print("Error: reading overlaps with another column")
+		return error_return
+	
 	pixels_arr = numpy.zeros((lower - upper + 1, right - left + 1))
 
 	for x in range (pixels_arr.shape[0]):
 		for y in range(pixels_arr.shape[1]):
 			if(pixels[left + y,upper + x] == 0):
 				pixels_arr[x][y] = 1
-	
+
 	try_with_original_pixel = read_digit_sequence(pixels_arr)
+	
 	if(try_with_original_pixel !=error_return):
 		return try_with_original_pixel
 
+	# If the current orientation returns invalid value, rotate the digit and read again
+	# Number could be in upright or rotated position in the graph
 	pixels_arr_rotate = numpy.zeros((pixels_arr.shape[1], pixels_arr.shape[0]))
 
 	height = pixels_arr.shape[0] - 1
