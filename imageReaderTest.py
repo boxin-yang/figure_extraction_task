@@ -34,11 +34,22 @@ class imageReaderTest(unittest.TestCase):
 		expected_reading_test2 = [35052, 11083, 3458, 2110, 1097, 867, 679, 6442, 2803, 1305, 844, 632, 491, 869, 1327, 968, 820, 749, 542, 629, 583, 426, 408, 380, 431, 367, 337, 202, 149, 416, 999, 1002]
 		self.assertEqual(test2_reading, expected_reading_test2)
 
-		# test3_reading = read_image("test3.png")
-		# print(test3_reading)
-		# expected_reading_test3 = [35052, 11083, 3458, 2110, 1097, 867, 679, 6442, 2803, 1305, 844, 632, 491, 869, 1327, 968, 820, 749, 542, 629, 583, 426, 408, 380, 431, 367, 337, 202, 149, 416, 999, 1002]
-		# self.assertEqual(test3_reading, expected_reading_test3)
+		test3_reading = read_image("test3.png")
+		expected_reading_test3 = [8, 9, 6, 4, 2, 3, 0, 1, -1, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 4, 1, 2]
+		self.assertEqual(test3_reading, expected_reading_test3)
 
+		test4_reading = read_image("test4.png")
+		expected_reading_test4 = [200, 20, 0, 0, 0, 0, 0, 0, 0, 0, 55, 415, 195, 381, 367]
+		self.assertEqual(test4_reading, expected_reading_test4)
+
+		test5_reading = read_image("test5.png")
+		expected_reading_test5 = [39079, 5744, 1780, 5508, 1559, 4498, 0, 3478, 5643, 1003, 9905, 5349, 2791, 5952, 1614, 30, 1189, 2386, 5564, 1657, 1687, 1473, 1448, 884, 30, 830, 2, 929, -2157, 522, 100, 1633, 0, 4058, 930, 1993, 34, 5382, 4701, 8822, 11248]
+		self.assertEqual(test5_reading, expected_reading_test5)
+
+		test6_reading = read_image("test6.png")
+		print(test6_reading)
+		expected_reading_test6 = [39079, 5744, 1780, 5508, 1559, 4498, 0, 3478, 5643, 1003, 9905, 5349, 2791, 5952, 1614, 30, 1189, 2386, 5564, 1657, 1687, 1473, 1448, 884, 30, 830, 2, 929, -2157, 522, 100, 1633, 0, 4058, 930, 1993, 34, 5382, 4701, 8822, 11248]
+		# self.assertEqual(test6_reading, expected_reading_test6)
 
 if __name__ == '__main__':
 	unittest.main()

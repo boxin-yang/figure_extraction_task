@@ -55,7 +55,7 @@ def read_image(image_name):
 	current_row = im.size[1] - 1
 	horizontal_axis = -1
 
-	while(current_row >0 and horizontal_axis == -1):
+	while(current_row > 0 and horizontal_axis == -1):
 		if (pixels[middle_coloum, current_row] != 0) :
 			current_row -= 1
 			continue
@@ -237,7 +237,15 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 2])
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 3])
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 4])
-			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 5])):
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 5])
+			or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row - 1])
+			or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row - 1])
+			or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row - 1])
+			or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row - 1])
+			or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row - 2])
+			or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row - 2])
+			or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row - 2])
+			or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row - 2])):
 			curr_row -= 1
 			continue
 
@@ -277,10 +285,27 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 					or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
 					curr_row += 1
 					continue
+			
+			# If the column has more black pixel, not finished yet
+			if (is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 1])
+				or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 2])
+				or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 3])
+				or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 4])
+				or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 5])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row + 1])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row + 1])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row + 1])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row + 1])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row + 2])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row + 2])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row + 2])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row + 2])):
+				curr_row += 1
+				continue
 
 			lower = curr_row
 			break
-
+	
 	middle = (upper + lower) / 2
 	if is_debug_on:
 		print("read_column upper, lower, middle", upper, lower, middle)
