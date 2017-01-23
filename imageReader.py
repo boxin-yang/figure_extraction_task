@@ -5,6 +5,12 @@ from digitReader import read_digit_sequence
 is_debug_on = False
 error_return = -100000
 
+def is_a_digit_pixel(black_pixel_value, val):
+	if (black_pixel_value == 0):
+		return val == 0
+	else :
+		return val <= 114
+
 def read_image(image_name):
 	'''This function reads a graph plot.
 
@@ -102,7 +108,7 @@ def read_image(image_name):
 	has_error = False
 
 	for x in graph_columns:
-		data = read_column(x, column_distance, horizontal_axis, pixels)
+		data = read_column(x, column_distance, horizontal_axis, vertical_axis, pixels)
 		graph_data.append(data)
 		if (data == error_return) :
 			has_error = True
@@ -117,17 +123,20 @@ def read_image(image_name):
 
 	return graph_data
 
-def read_column(col, column_distance, horizontal_axis, pixels):
+def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	'''This function reads the data of the column in the graph
+
+	Found out that digits might be printed in grey with L value 104 or 114
 	'''
 	if is_debug_on:
 		print("read_column called with param: col, column_distance, horizontal_axis", col, column_distance, horizontal_axis)
 	
 	# Find the first black pixel above the vertical axis
 	# Start searching 3 pixels above the axis to avoid searching axis label
-	# TODO: consider searching from col + 1 to avoid searching axis label
+	# search black pixels first
 	curr_row = horizontal_axis - 3
 	first_black_pixel = -1
+	black_pixel_value = -1
 
 	while (curr_row > 50):
 		if (pixels[col, curr_row] != 0):
@@ -137,22 +146,47 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			break
 
 	# Check +1 -1 column for black pixel, else return 0 as 0 is not printed in some graphs
-	if first_black_pixel <= 50:
+	if first_black_pixel == -1:
 		curr_row = horizontal_axis - 1
-		first_black_pixel = -1
 
 		while(curr_row > 50):
-			if (pixels[col - 1, curr_row] != 0 or pixels[col + 1, curr_row] != 0):
+			if ((pixels[col - 1, curr_row] != 0) and (pixels[col + 1, curr_row] != 0)):
 				curr_row -= 1
 			else :
 				first_black_pixel = curr_row
 				break
-		
-		if (first_black_pixel == -1):
-			return 0
 
+	if (first_black_pixel != -1):
+		black_pixel_value = 0
+	else:
+		# if no black pixels are found
+		curr_row = horizontal_axis - 3
+
+		while (curr_row > 50):
+			if (pixels[col, curr_row] > 114):
+				curr_row -= 1
+			else :
+				first_black_pixel = curr_row
+				break
+
+		# Check +1 -1 column for black pixel, else return 0 as 0 is not printed in some graphs
+		if first_black_pixel == -1:
+			curr_row = horizontal_axis - 1
+
+			while(curr_row > 50):
+				if ((pixels[col - 1, curr_row] > 114) and (pixels[col + 1, curr_row] > 114)):
+					curr_row -= 1
+				else :
+					first_black_pixel = curr_row
+					black_pixel_value = min(pixels[col - 1, curr_row], pixels[col + 1, curr_row])
+					break
+
+	# if no dark pixels detected
+	if (first_black_pixel == -1):
+		return 0
+	
 	if is_debug_on:
-		print("read_column: first_black_pixel found is at row", first_black_pixel)
+		print("read_column: first_black_pixel found is at row", first_black_pixel, "black pixel value is", black_pixel_value)
 
 	# from this first black pixel find the crop that contains the digit
 	upper = -1
@@ -167,33 +201,43 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	# find upper
 	curr_row = first_black_pixel
 	while (curr_row > 0) :
-		if(pixels[col, curr_row] == 0):
+		if is_a_digit_pixel(black_pixel_value, pixels[col, curr_row]):
 			curr_row -= 1
 			continue
 
 		# If the row has more black pixel, not finished yet
-		if (pixels[col - 6, curr_row] == 0
-			or pixels[col - 5, curr_row] == 0
-			or pixels[col - 4, curr_row] == 0
-			or pixels[col - 3, curr_row] == 0
-			or pixels[col - 2, curr_row] == 0
-			or pixels[col - 1, curr_row] == 0
-			or pixels[col + 1, curr_row] == 0
-			or pixels[col + 2, curr_row] == 0
-			or pixels[col + 3, curr_row] == 0
-			or pixels[col + 4, curr_row] == 0
-			or pixels[col + 5, curr_row] == 0
-			or pixels[col + 6, curr_row] == 0
-			):
-			curr_row -= 1
-			continue
+		# checking for first column is partial to avoid touching vertical axis
+		if (col - vertical_axis < column_distance) :
+			if (is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 3, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 4, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 5, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
+				curr_row -= 1
+				continue
+		else:
+			if (is_a_digit_pixel(black_pixel_value, pixels[col - 6, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 5, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 4, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 3, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 3, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 4, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 5, curr_row])
+				or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
+				curr_row -= 1
+				continue
 
 		# If the column has more black pixel, not finished yet
-		if (pixels[col, curr_row - 1] == 0
-			or pixels[col, curr_row - 2] == 0
-			or pixels[col, curr_row - 3] == 0
-			or pixels[col, curr_row - 4] == 0
-			or pixels[col, curr_row - 5] == 0):
+		if (is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 1])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 2])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 3])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 4])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 5])):
 			curr_row -= 1
 			continue
 
@@ -205,22 +249,34 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		curr_row = first_black_pixel + 1
 		while (curr_row < horizontal_axis) :
 			# print("curr_row", curr_row)
-			if(pixels[col, curr_row] == 0):
+			if(is_a_digit_pixel(black_pixel_value, pixels[col, curr_row])):
 				curr_row += 1
 				continue
 
-			# If the row has more black pixel, not finished yet
-			if (pixels[col - 4, curr_row] == 0
-				or pixels[col - 3, curr_row] == 0
-				or pixels[col - 2, curr_row] == 0
-				or pixels[col - 1, curr_row] == 0
-				or pixels[col + 1, curr_row] == 0
-				or pixels[col + 2, curr_row] == 0
-				or pixels[col + 3, curr_row] == 0
-				or pixels[col + 3, curr_row] == 0
-				):
-				curr_row += 1
-				continue
+			if (col - vertical_axis < column_distance) :
+				if (is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 3, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 4, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 5, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
+					curr_row += 1
+					continue
+			else:
+				if (is_a_digit_pixel(black_pixel_value, pixels[col - 6, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col - 5, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col - 4, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col - 3, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col - 2, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 3, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 4, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 5, curr_row])
+					or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
+					curr_row += 1
+					continue
 
 			lower = curr_row
 			break
@@ -233,9 +289,9 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	curr_column = col - 1
 	while (col - curr_column < column_distance) :
 		# use 3 points for efficient testing
-		if(pixels[curr_column, upper + 1] == 0
-		   or pixels[curr_column, lower - 1] == 0
-		   or pixels[curr_column, middle] == 0):
+		if(is_a_digit_pixel(black_pixel_value, pixels[curr_column, upper + 1])
+		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, lower - 1])
+		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, middle])):
 			curr_column -= 1
 			continue
 
@@ -244,7 +300,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			if not has_no_black_pixel:
 				break
 			for y in range(upper, lower + 1):
-				if (pixels[curr_column - x, y] == 0):
+				if (is_a_digit_pixel(black_pixel_value, pixels[curr_column - x, y])):
 					has_no_black_pixel = False
 					break
 				
@@ -258,9 +314,9 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 	curr_column = col + 1
 	while (curr_column - col < column_distance) :
 		# use 3 points for efficient testing
-		if(pixels[curr_column, upper + 1] == 0
-		   or pixels[curr_column, lower - 1] == 0
-		   or pixels[curr_column, middle] == 0):
+		if(is_a_digit_pixel(black_pixel_value, pixels[curr_column, upper + 1])
+		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, lower - 1])
+		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, middle])):
 			curr_column += 1
 			continue
 
@@ -269,7 +325,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			if not has_no_black_pixel:
 				break
 			for y in range(upper, lower + 1):
-				if (pixels[curr_column + x, y] == 0):
+				if (is_a_digit_pixel(black_pixel_value, pixels[curr_column + x, y])):
 					has_no_black_pixel = False
 					break
 				
@@ -283,7 +339,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
 
 	# if cropping goes to another column, high chance of reading overlap
-	if (col - left == column_distance or curr_column - right == column_distance):
+	if (col - left >= column_distance or right - col >= column_distance):
 		print("Error: reading overlaps with another column")
 		return error_return
 	
@@ -291,7 +347,7 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 
 	for x in range (pixels_arr.shape[0]):
 		for y in range(pixels_arr.shape[1]):
-			if(pixels[left + y,upper + x] == 0):
+			if(is_a_digit_pixel(black_pixel_value, pixels[left + y,upper + x])):
 				pixels_arr[x][y] = 1
 
 	try_with_original_pixel = read_digit_sequence(pixels_arr)
