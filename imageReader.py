@@ -136,12 +136,20 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			first_black_pixel = curr_row
 			break
 
-	# cannot find the digit
-	# 50 is hard coded value, might need to be changed if found exceptions
-	if read_column <= 50:
-		# 0 value is not printed on some graphs
-		# TODO: add in checking for 0
-		return error_return
+	# Check +1 -1 column for black pixel, else return 0 as 0 is not printed in some graphs
+	if first_black_pixel <= 50:
+		curr_row = horizontal_axis - 1
+		first_black_pixel = -1
+
+		while(curr_row > 50):
+			if (pixels[col - 1, curr_row] != 0 or pixels[col + 1, curr_row] != 0):
+				curr_row -= 1
+			else :
+				first_black_pixel = curr_row
+				break
+		
+		if (first_black_pixel == -1):
+			return 0
 
 	if is_debug_on:
 		print("read_column: first_black_pixel found is at row", first_black_pixel)
@@ -164,14 +172,18 @@ def read_column(col, column_distance, horizontal_axis, pixels):
 			continue
 
 		# If the row has more black pixel, not finished yet
-		if (pixels[col - 4, curr_row] == 0
+		if (pixels[col - 6, curr_row] == 0
+			or pixels[col - 5, curr_row] == 0
+			or pixels[col - 4, curr_row] == 0
 			or pixels[col - 3, curr_row] == 0
 			or pixels[col - 2, curr_row] == 0
 			or pixels[col - 1, curr_row] == 0
 			or pixels[col + 1, curr_row] == 0
 			or pixels[col + 2, curr_row] == 0
 			or pixels[col + 3, curr_row] == 0
-			or pixels[col + 3, curr_row] == 0
+			or pixels[col + 4, curr_row] == 0
+			or pixels[col + 5, curr_row] == 0
+			or pixels[col + 6, curr_row] == 0
 			):
 			curr_row -= 1
 			continue

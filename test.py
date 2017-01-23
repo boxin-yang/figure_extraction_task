@@ -3,20 +3,20 @@ import numpy
 from pytesseract import *
 from imageReader import *
 
-try:
-	list = []
-	list[5] = 1
-except IndexError:
-	print("exception caught")
-# im = Image.open("sample1.png")
+# try:
+# 	list = []
+# 	list[5] = 1
+# except IndexError:
+# 	print("exception caught")
+im = Image.open("sample4.tiff")
 # im = im.convert("L")
 # pix = im.load()
 # print(pix[187, 114])
 # print(pix[187, 115])
 
-# im = im.crop((113, 186, 119, 189))
+im = im.crop((162, 210, 183, 220))
 # print(im.size)
-# im.show()
+im.show()
 # print(im.size)
 # pix = im.load()
 # for y in range(im.size[1]):
