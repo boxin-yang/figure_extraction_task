@@ -2,7 +2,7 @@ import numpy
 from PIL import Image
 from digitReader import read_digit_sequence
 
-is_debug_on = False
+is_debug_on = True
 error_return = -100000
 
 def is_a_digit_pixel(black_pixel_value, val):

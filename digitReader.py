@@ -1,6 +1,6 @@
 import numpy 
 
-is_debug_on = False
+is_debug_on = True
 error_return = -100000
 dollar_sign_return_value = -2
 negative_sign_return_value = -3
@@ -91,6 +91,8 @@ def read_digit_sequence(arr):
 		try:
 			digit = pixel_array_to_digit(temp)
 		except IndexError:
+			if is_debug_on:
+				print("index of out bound error")
 			digit = error_return
 		
 		if (digit == error_return) :
@@ -107,7 +109,8 @@ def read_digit_sequence(arr):
 		ending_column = -1
 
 	if (len(result) == 0):
-		# print("Error: no digit is read")
+		if is_debug_on:
+			print("Error: no digit is read")
 		return error_return
 
 	final_result = 0
@@ -365,6 +368,9 @@ def pixel_array_to_digit(arr):
 			print(arr)
 		return error_return
 
+	if is_debug_on:
+		print("left_most_x, left_most_y", left_most_x, left_most_y)
+	
 	# Test for - sign
 	# TODO: think of a better way to place the code
 	if(arr.shape[1] - left_most_y > 2
@@ -374,12 +380,39 @@ def pixel_array_to_digit(arr):
 		    or arr[left_most_x + 2][left_most_y + 2] == 0):
 			return negative_sign_return_value
 	
+	if is_debug_on:
+		print("not - sign")
+
 	# Test for "," mark
 	if(left_most_x > 0 
 	   and arr[left_most_x - 1][left_most_y + 1] == 1):
 		if(arr.shape[1] - left_most_y < 3
-		   or (arr[left_most_x - 1][left_most_y + 2] == 0 and arr[left_most_x][left_most_y + 1] == 0)):
+		   or (arr[left_most_x - 1][left_most_y + 2] == 0 
+		       and arr[left_most_x][left_most_y + 1] == 0
+		       and arr[left_most_x][left_most_y + 2] == 0)):
 			return comma_return_value
+
+	if is_debug_on:
+		print("not , mark")
+
+	# Test for .0 , the special case of 0 where one black pixel preceeds the 0 on the left
+	if (left_most_x > 3 and arr.shape[1] - left_most_y > 5
+	    	and arr[left_most_x - 4][left_most_y + 2] == 1
+		    and arr[left_most_x - 4][left_most_y + 3] == 1
+		    and arr[left_most_x - 3][left_most_y + 1] == 1
+		    and arr[left_most_x - 3][left_most_y + 4] == 1
+		    and arr[left_most_x - 2][left_most_y + 1] == 1
+		    and arr[left_most_x - 2][left_most_y + 4] == 1
+		    and arr[left_most_x - 1][left_most_y + 1] == 1
+		    and arr[left_most_x - 1][left_most_y + 4] == 1
+		    and arr[left_most_x][left_most_y + 2] == 1
+		    and arr[left_most_x][left_most_y + 3] == 1):
+		print("here")
+		return 0
+
+	if is_debug_on:
+		print("not .0 case")
+
 
 	# A valid digit or $ pixel has at least 5 rows, 2 coloums
 	# Quite test for wrong orientation
