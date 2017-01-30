@@ -7,7 +7,8 @@ negative_sign_return_value = -3
 comma_return_value = -4
 pound_return_value = -5
 euro_sign_return_value = -6
-
+letter_k_return_value = -7
+letter_r_return_value = -8
 def read_digit_sequence(arr):
 	'''This function reads a list of single digit
 
@@ -329,6 +330,36 @@ def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
 		   and arr[left_most_x + 3][left_most_y + 3] == 1):
 			return 0
 
+	# letter_k_return_value for k letter in krone
+	if (digit == letter_k_return_value):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 3] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1
+		   and arr[left_most_x + 4][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y + 3] == 1):
+			return 0
+
+	# letter_r_return_value for r letter in krone
+	if(digit == letter_r_return_value):
+		if(arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x][left_most_y + 1] == 1
+		   and arr[left_most_x][left_most_y + 2] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 3] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 2][left_most_y + 1] == 1
+		   and arr[left_most_x + 2][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1
+		   and arr[left_most_x + 4][left_most_y] == 1
+		   and arr[left_most_x + 4][left_most_y + 3] == 1):
+			return 0
+
 	return error_return
 
 def pixel_array_to_digit(arr):
@@ -440,7 +471,7 @@ def pixel_array_to_digit(arr):
 	# A flow chart is available on https://github.com/greed-is-good/figure_extraction_task
 
 	if (arr[left_most_x][left_most_y + 1] == 0):
-		# {0,4,6,8,9,$,euro}
+		# {0,4,6,8,9,$,euro,k}
 		if (arr[left_most_x + 1][left_most_y] == 0):
 			# {8,9,$}
 			if (arr[left_most_x + 2][left_most_y] == 1):
@@ -454,7 +485,7 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, dollar_sign_return_value, left_most_x, left_most_y)
 
 		else :
-			# {0,4,6,euro}
+			# {0,4,6,euro,k}
 			if (arr[left_most_x][left_most_y + 3] == 0):
 				# {6, euro}
 				if (arr[left_most_x - 1][left_most_y + 3] == 0):
@@ -462,14 +493,18 @@ def pixel_array_to_digit(arr):
 				else :
 					return verify_digit_pixels(arr, euro_sign_return_value, left_most_x, left_most_y)
 			else :
-				# {0,4}
+				# {0,4,k}
 				if(arr[left_most_x + 2][left_most_y + 1] == 0):
 					return verify_digit_pixels(arr, 0, left_most_x, left_most_y)
 				else :
-					return verify_digit_pixels(arr, 4, left_most_x, left_most_y)
+					# {4, K}
+					if (arr[left_most_x + 3][left_most_y] == 0):
+						return verify_digit_pixels(arr, 4, left_most_x, left_most_y)
+					else :
+						return verify_digit_pixels(arr, letter_k_return_value, left_most_x, left_most_y)
 
 	else :
-		# {1,2,3,5,7, pound}
+		# {1,2,3,5,7,pound,R}
 		if (left_most_x > 0 and arr[left_most_x - 1][left_most_y + 1] == 1):
 			return verify_digit_pixels(arr, pound_return_value, left_most_x, left_most_y)
 		
@@ -481,7 +516,7 @@ def pixel_array_to_digit(arr):
 				return verify_digit_pixels(arr, 1, left_most_x, left_most_y)
 
 		else:
-			# {2,3,5}
+			# {2,3,5,R}
 			if (arr[left_most_x + 1][left_most_y] == 0):
 				# {2,3}
 				if (arr[left_most_x + 3][left_most_y] == 0):
@@ -490,7 +525,11 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, 2, left_most_x, left_most_y)
 
 			else:
-				return verify_digit_pixels(arr, 5, left_most_x, left_most_y)
+				# {5,R}
+				if (arr[left_most_x + 3][left_most_y] == 0):
+					return verify_digit_pixels(arr, 5, left_most_x, left_most_y)
+				else :
+					return verify_digit_pixels(arr, letter_r_return_value, left_most_x, left_most_y)
 
 
 

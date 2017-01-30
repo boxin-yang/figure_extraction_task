@@ -129,7 +129,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	Found out that digits might be printed in grey with L value 104 or 114
 	'''
 	if is_debug_on:
-		print("read_column called with param: col, column_distance, horizontal_axis", col, column_distance, horizontal_axis)
+		print("read_column called with param: col, column_distance, horizontal_axis, vertical_axis", col, column_distance, horizontal_axis, vertical_axis)
 	
 	# Find the first black pixel above the vertical axis
 	# Start searching 3 pixels above the axis to avoid searching axis label
@@ -333,29 +333,32 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 		print("read_column upper, lower, middle", upper, lower, middle)
 
 	# find left
-	curr_column = col - 1
-	while (col - curr_column < column_distance) :
-		# use 3 points for efficient testing
-		if(is_a_digit_pixel(black_pixel_value, pixels[curr_column, upper + 1])
-		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, lower - 1])
-		   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, middle])):
-			curr_column -= 1
-			continue
+	if (col - vertical_axis < column_distance):
+		left = vertical_axis + 3
+	else :
+		curr_column = col - 1
+		while (col - curr_column < column_distance) :
+			# use 3 points for efficient testing
+			if(is_a_digit_pixel(black_pixel_value, pixels[curr_column, upper + 1])
+			   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, lower - 1])
+			   or is_a_digit_pixel(black_pixel_value, pixels[curr_column, middle])):
+				curr_column -= 1
+				continue
 
-		has_no_black_pixel = True
-		for x in range(3):
-			if not has_no_black_pixel:
-				break
-			for y in range(upper, lower + 1):
-				if (is_a_digit_pixel(black_pixel_value, pixels[curr_column - x, y])):
-					has_no_black_pixel = False
+			has_no_black_pixel = True
+			for x in range(3):
+				if not has_no_black_pixel:
 					break
-				
-		if has_no_black_pixel:
-			left = curr_column
-			break
-		else:
-			curr_column -= 1
+				for y in range(upper, lower + 1):
+					if (is_a_digit_pixel(black_pixel_value, pixels[curr_column - x, y])):
+						has_no_black_pixel = False
+						break
+					
+			if has_no_black_pixel:
+				left = curr_column
+				break
+			else:
+				curr_column -= 1
 		
 	# find right
 	curr_column = col + 1
@@ -384,6 +387,9 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	
 	if is_debug_on:
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
+
+	if (left == -1 or right == -1):
+		return error_return
 
 	# if cropping goes to another column, high chance of reading overlap
 	if (col - left >= column_distance or right - col >= column_distance):
