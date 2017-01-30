@@ -4,14 +4,21 @@ from pytesseract import *
 from imageReader import *
 
 
-im = Image.open("test2.png")
+im = Image.open("sample1.png")
 im = im.convert("L")
-im = im.crop((190, 200, 200, 220))
-im.show()
+# im = im.crop((140, 212, 150, 220))
+# im.show()
 pix = im.load()
-for x in range(19):
-	for y in range(9):
-		print(x, y, pix[y,x])
+print("142, 218",pix[142,218])
+print("144, 218",pix[144,218])
+print("142, 217",pix[142,217])
+print("143, 217",pix[143,217])
+print("144, 217",pix[144,217])
+print(is_a_digit_pixel(0, pix[144,218]))
+
+# for x in range(8):
+# 	for y in range(9):
+# 		print(x, y, pix[y,x])
 
 # try:
 # 	list = []

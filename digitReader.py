@@ -6,6 +6,7 @@ dollar_sign_return_value = -2
 negative_sign_return_value = -3
 comma_return_value = -4
 pound_return_value = -5
+euro_sign_return_value = -6
 
 def read_digit_sequence(arr):
 	'''This function reads a list of single digit
@@ -297,7 +298,7 @@ def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
 		   and arr[left_most_x + 4][left_most_y + 2] == 1):
 			return 0
 
-	# dollar_sign_return_value for pound sign
+	# pound_return_value for pound sign
 	if(digit == pound_return_value):
 		if(arr[left_most_x - 2][left_most_y + 2] == 1
 		   and arr[left_most_x - 2][left_most_y + 3] == 1
@@ -311,6 +312,21 @@ def verify_digit_pixels(arr, digit, left_most_x, left_most_y):
 		   and arr[left_most_x + 2][left_most_y + 1] == 1
 		   and arr[left_most_x + 2][left_most_y + 2] == 1
 		   and arr[left_most_x + 2][left_most_y + 3] == 1):
+			return 0
+
+	# pound_return_value for euro sign
+	if (digit == euro_sign_return_value):
+		if(arr[left_most_x - 1][left_most_y + 1] == 1
+		   and arr[left_most_x - 1][left_most_y + 2] == 1
+		   and arr[left_most_x - 1][left_most_y + 3] == 1
+		   and arr[left_most_x][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y] == 1
+		   and arr[left_most_x + 1][left_most_y + 1] == 1
+		   and arr[left_most_x + 1][left_most_y + 2] == 1
+		   and arr[left_most_x + 2][left_most_y] == 1
+		   and arr[left_most_x + 3][left_most_y + 1] == 1
+		   and arr[left_most_x + 3][left_most_y + 2] == 1
+		   and arr[left_most_x + 3][left_most_y + 3] == 1):
 			return 0
 
 	return error_return
@@ -424,7 +440,7 @@ def pixel_array_to_digit(arr):
 	# A flow chart is available on https://github.com/greed-is-good/figure_extraction_task
 
 	if (arr[left_most_x][left_most_y + 1] == 0):
-		# {0,4,6,8,9,$}
+		# {0,4,6,8,9,$,euro}
 		if (arr[left_most_x + 1][left_most_y] == 0):
 			# {8,9,$}
 			if (arr[left_most_x + 2][left_most_y] == 1):
@@ -438,9 +454,13 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, dollar_sign_return_value, left_most_x, left_most_y)
 
 		else :
-			# {0,4,6}
+			# {0,4,6,euro}
 			if (arr[left_most_x][left_most_y + 3] == 0):
-				return verify_digit_pixels(arr, 6, left_most_x, left_most_y)
+				# {6, euro}
+				if (arr[left_most_x - 1][left_most_y + 3] == 0):
+					return verify_digit_pixels(arr, 6, left_most_x, left_most_y)
+				else :
+					return verify_digit_pixels(arr, euro_sign_return_value, left_most_x, left_most_y)
 			else :
 				# {0,4}
 				if(arr[left_most_x + 2][left_most_y + 1] == 0):

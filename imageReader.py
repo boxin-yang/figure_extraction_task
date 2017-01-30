@@ -145,7 +145,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 			first_black_pixel = curr_row
 			break
 
-	# Check +1 -1 column for black pixel, else return 0 as 0 is not printed in some graphs
+	# Check +1 -1 column for black pixel
 	if first_black_pixel == -1:
 		curr_row = horizontal_axis - 1
 
@@ -162,14 +162,16 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 		# if no black pixels are found
 		curr_row = horizontal_axis - 3
 
+		# check for grey pixel
 		while (curr_row > 50):
 			if (pixels[col, curr_row] > 114):
 				curr_row -= 1
 			else :
 				first_black_pixel = curr_row
+				black_pixel_value = pixels[col, curr_row]
 				break
 
-		# Check +1 -1 column for black pixel, else return 0 as 0 is not printed in some graphs
+		# Check +1 -1 column for grey pixel, else return 0 as 0 is not printed in some graphs
 		if first_black_pixel == -1:
 			curr_row = horizontal_axis - 1
 
@@ -194,10 +196,25 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	left = -1
 	right = -1
 
+	# Some axis has unwanted black pixels above horizontal axis(e.g. sample4.tiff)
+	need_to_prune_pixels_above_horizontal_axis = False
+
 	# if first black pixel is close to horizontal axis, just take horizontal_axis - 1 as the lower bound
 	if (horizontal_axis - first_black_pixel < 10):
 		lower = horizontal_axis - 1
-	
+
+		# bizzare behavior in test9.png, where a black pixel is 2 rows above the horizontal axis
+		if (pixels[col, horizontal_axis - 2] == 0
+		    and not (is_a_digit_pixel(black_pixel_value, pixels[col - 1, horizontal_axis - 2])
+		      or is_a_digit_pixel(black_pixel_value, pixels[col + 1, horizontal_axis - 2])
+		      or is_a_digit_pixel(black_pixel_value, pixels[col - 1, horizontal_axis - 3])
+		      or is_a_digit_pixel(black_pixel_value, pixels[col, horizontal_axis - 3])
+		      or is_a_digit_pixel(black_pixel_value, pixels[col + 1, horizontal_axis - 3])
+		      or is_a_digit_pixel(black_pixel_value, pixels[col + 1, horizontal_axis - 3]))):
+			need_to_prune_pixels_above_horizontal_axis = True
+			if is_debug_on:
+				print("Need to prune pixels above horizontal axis")
+
 	# find upper
 	curr_row = first_black_pixel
 	while (curr_row > 0) :
@@ -306,6 +323,11 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 			lower = curr_row
 			break
 	
+	if (lower == -1):
+		if is_debug_on:
+			print("lower reading is -1")
+		return error_return
+
 	middle = (upper + lower) / 2
 	if is_debug_on:
 		print("read_column upper, lower, middle", upper, lower, middle)
@@ -374,6 +396,11 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 		for y in range(pixels_arr.shape[1]):
 			if(is_a_digit_pixel(black_pixel_value, pixels[left + y,upper + x])):
 				pixels_arr[x][y] = 1
+
+	if need_to_prune_pixels_above_horizontal_axis:
+		# if this flag is on, lower = horizontal_axis - 1
+		pixels_arr[pixels_arr.shape[0] - 1][col - left] = 0
+		pixels_arr[pixels_arr.shape[0] - 2][col - left] = 0
 
 	try_with_original_pixel = read_digit_sequence(pixels_arr)
 	
