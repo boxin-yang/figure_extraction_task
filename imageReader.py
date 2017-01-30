@@ -210,7 +210,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	need_to_prune_pixels_above_horizontal_axis = False
 
 	# if first black pixel is close to horizontal axis, just take horizontal_axis - 1 as the lower bound
-	if (horizontal_axis - first_black_pixel < 10):
+	if (horizontal_axis - first_black_pixel < 12):
 		lower = horizontal_axis - 1
 
 		# bizzare behavior in test9.png, where a black pixel is 2 rows above the horizontal axis

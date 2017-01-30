@@ -75,12 +75,20 @@ class imageReaderTest(unittest.TestCase):
 		test12_reading = read_image("test12.png")
 		expected_reading_test12 = [30]
 		self.assertEqual(test12_reading, expected_reading_test12)		
-		'''
-		test13_reading = read_image("test13.png")
-		print(test13_reading)
-		expected_reading_test13 = [30]
-		# self.assertEqual(test13_reading, expected_reading_test13)		
 
+		test13_reading = read_image("test13.png")
+		expected_reading_test13 = [3420, 2689, 1206, 971, 1132, 337, 490, 410, 10, -140, 285, 140, 161, 25, 0, 175, 175, 335, 0, 175, 0, 355, 35, 125, 0, 0, 0, 300, 146, 160, 510]
+		self.assertEqual(test13_reading, expected_reading_test13)		
+		
+		test14_reading = read_image("test14.png")
+		expected_reading_test14 = [255, 0, 68, 60, 0, 150, 7, 62, 60, 18, 7, 130, 82, 5, 209, 30, -28, -17, 0, 29, 140, 13, 245]
+		self.assertEqual(test14_reading, expected_reading_test14)		
+		
+		test15_reading = read_image("test15.png")
+		expected_reading_test15 = [5, 12, 5, 8, 7, 12, 15, 1, 3, 2, 3, 3, 3, 3, 3, 5, 4, 6, 13, 7, 5, 22, 10, 7, 8, 3, 15, 7, 7, 7, 2, 14, 6, 9, 24, 46, 3]
+		self.assertEqual(test15_reading, expected_reading_test15)		
+		'''
+		
 if __name__ == '__main__':
 	unittest.main()
 
