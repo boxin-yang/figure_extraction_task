@@ -11,6 +11,12 @@ def is_a_digit_pixel(black_pixel_value, val):
 	else :
 		return val <= 114
 
+def is_a_horizontal_axis_pixel(val):
+	return (val == 0) or (val == 11) or (val == 20)
+
+def is_a_pixel_to_indicate_column_under_horizontal_axis(val):
+	return (val == 0) or (val == 9)
+
 def read_image(image_name):
 	'''This function reads a graph plot.
 
@@ -56,13 +62,13 @@ def read_image(image_name):
 	horizontal_axis = -1
 
 	while(current_row > 0 and horizontal_axis == -1):
-		if (pixels[middle_coloum, current_row] != 0) :
+		if not is_a_horizontal_axis_pixel(pixels[middle_coloum, current_row]) :
 			current_row -= 1
 			continue
 
 		black_pixel_count = 0
 		for x in range(-30, 30):
-			if (pixels[middle_coloum + x, current_row] == 0):
+			if is_a_horizontal_axis_pixel(pixels[middle_coloum + x, current_row]):
 				black_pixel_count += 1
 
 		if (black_pixel_count > 50) :
@@ -85,7 +91,7 @@ def read_image(image_name):
 	graph_columns = []
 	
 	while (current_column < im.size[0]):
-		if(pixels[current_column, horizontal_axis + 1] == 0):
+		if is_a_pixel_to_indicate_column_under_horizontal_axis(pixels[current_column, horizontal_axis + 1]):
 			graph_columns.append(current_column)
 
 		current_column += 1
@@ -106,8 +112,12 @@ def read_image(image_name):
 	graph_data = []
 	
 	has_error = False
+	pos = 0
 
 	for x in graph_columns:
+		if is_debug_on:
+			pos += 1
+			print("Now read column", pos)
 		data = read_column(x, column_distance, horizontal_axis, vertical_axis, pixels)
 		graph_data.append(data)
 		if (data == error_return) :

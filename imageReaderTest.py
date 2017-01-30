@@ -46,11 +46,11 @@ class imageReaderTest(unittest.TestCase):
 		test5_reading = read_image("test5.png")
 		expected_reading_test5 = [39079, 5744, 1780, 5508, 1559, 4498, 0, 3478, 5643, 1003, 9905, 5349, 2791, 5952, 1614, 30, 1189, 2386, 5564, 1657, 1687, 1473, 1448, 884, 30, 830, 2, 929, -2157, 522, 100, 1633, 0, 4058, 930, 1993, 34, 5382, 4701, 8822, 11248]
 		self.assertEqual(test5_reading, expected_reading_test5)
-		'''
+
 		test6_reading = read_image("test6.png")
 		expected_reading_test6 = [115, 325, 625, 171, 15, 76, 11, 401, 0, 0, 10, 0, 0, 0, 210, 121, 125, 1, 50, 175, 50, 531, 50, 50, 11, 0, 0, 0, 70, 332, 50, 10, 25, 0, 0, 50, 10, 0, 40, 0, 0, 0, 0, 1, 1, 6, 0, 2, 0, 25, 0, 20, 10, 10, 120, 40, 100, 85, 135, 125, 155]
 		self.assertEqual(test6_reading, expected_reading_test6)
-		'''
+
 		test7_reading = read_image("test7.png")
 		expected_reading_test7 = [111, 178, 319, 143, 65, 128, 56, 390, 50, 0, 296, 20, 250, 0, 28, 143, 110, 20, 20, 78, 20, 120, 1698, 250, 0, 60, 161, 0, 0, 0, 196, 50, 115, 148]
 		self.assertEqual(test7_reading, expected_reading_test7)
@@ -66,10 +66,20 @@ class imageReaderTest(unittest.TestCase):
 		test10_reading = read_image("test10.png")
 		expected_reading_test10 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		self.assertEqual(test10_reading, expected_reading_test10)
-		'''
-
+		
+		# This is a rare case and not worse debugging
+		# The reading of one column spans into another column and confuses the program
 		# test11_reading = read_image("test11.png")
 		# print(test11_reading)
+
+		test12_reading = read_image("test12.png")
+		expected_reading_test12 = [30]
+		self.assertEqual(test12_reading, expected_reading_test12)		
+		'''
+		test13_reading = read_image("test13.png")
+		print(test13_reading)
+		expected_reading_test13 = [30]
+		# self.assertEqual(test13_reading, expected_reading_test13)		
 
 if __name__ == '__main__':
 	unittest.main()
