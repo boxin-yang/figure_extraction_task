@@ -2,7 +2,7 @@ import numpy
 from PIL import Image
 from digitReader import read_digit_sequence
 
-is_debug_on = False
+is_debug_on = True
 error_return = -100000
 error_return_long = -110000
 error_return_left = -100100
@@ -175,8 +175,50 @@ def read_image(image_name):
 
 		current_column += 1
 
+	# Now prune the columns in case digit is printed onto the axis
+	need_to_prune_graph_columns = False
+
+	if (len(graph_columns) > 4):
+		distance_from_last_column = graph_columns[1] - graph_columns[0]
+		
+		for i in range(1, len(graph_columns) - 1):
+			distance_to_next_column = graph_columns[i + 1] - graph_columns[i]
+			if (max(distance_to_next_column, distance_from_last_column) 
+			    / min(distance_to_next_column, distance_from_last_column) > 1):
+				need_to_prune_graph_columns = True
+				break
+			distance_from_last_column = distance_to_next_column
+
+	if need_to_prune_graph_columns:
+		estimated_column_distance = -1
+		for i in range(len(graph_columns) - 2):
+			dist1 = graph_columns[i + 1] - graph_columns[i]
+			dist2 = graph_columns[i + 2] - graph_columns[i + 1]
+			if (dist1 > 3
+			    and dist2 > 3
+			    and max(dist1, dist2) / min(dist1,dist2) == 1):
+				estimated_column_distance = dist1
+				break
+		
+		if (estimated_column_distance == -1) :
+			return
+	
+		# first column is not contaminated
+		if (abs(graph_columns[1] - graph_columns[0] - estimated_column_distance) < 3):
+			pos = 0
+			while(pos < len(graph_columns) - 1):
+				if (abs(graph_columns[pos + 1] - graph_columns[pos] - estimated_column_distance) > 2):
+					graph_columns.remove(graph_columns[pos + 1])
+				else:
+					pos += 1
+		else :
+			return
+	
 	if is_debug_on:
+		print("Graph columns are contaminated and the estimated_column_distance is", estimated_column_distance)
 		print("found following number of columns in the graph ", len(graph_columns))
+	
+	print(graph_columns)
 
 	# column_distance is used in read_column to avoid unexpected reading beyond column
 	if (len(graph_columns) > 1):
@@ -274,7 +316,18 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 
 	# if no dark pixels detected
 	if (first_black_pixel == -1):
-		return 0
+		# now check whether there are pixels below the axis
+		is_digit_printed_under_horizontal_axis = False
+		for x in range(-10,10):
+			if(is_a_digit_pixel(0, pixels[col + x, horizontal_axis + 4])
+			   or is_a_digit_pixel(0, pixels[col + x, horizontal_axis + 3])):
+				is_digit_printed_under_horizontal_axis = True
+				break
+
+		if is_digit_printed_under_horizontal_axis:
+			return error_return
+		else :
+			return 0
 
 	if is_debug_on:
 		print("read_column: first_black_pixel found is at row", first_black_pixel, "black pixel value is", black_pixel_value)
