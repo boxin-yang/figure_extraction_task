@@ -202,6 +202,9 @@ def read_image(image_name):
 		
 		if (estimated_column_distance == -1) :
 			return
+
+		if is_debug_on:
+			print("Graph columns are contaminated and the estimated_column_distance is", estimated_column_distance)
 	
 		# first column is not contaminated
 		if (abs(graph_columns[1] - graph_columns[0] - estimated_column_distance) < 3):
@@ -215,7 +218,6 @@ def read_image(image_name):
 			return
 	
 	if is_debug_on:
-		print("Graph columns are contaminated and the estimated_column_distance is", estimated_column_distance)
 		print("found following number of columns in the graph ", len(graph_columns))
 	
 	print(graph_columns)
@@ -356,6 +358,11 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 			need_to_prune_pixels_above_horizontal_axis = True
 			if is_debug_on:
 				print("Need to prune pixels above horizontal axis")
+		elif (pixels[col, horizontal_axis - 2] <= 114
+		      and not (is_a_digit_pixel(black_pixel_value, pixels[col, horizontal_axis - 3])
+		               or is_a_digit_pixel(black_pixel_value, pixels[col, horizontal_axis - 4])
+		               or is_a_digit_pixel(black_pixel_value, pixels[col, horizontal_axis - 4]))):
+			need_to_prune_pixels_above_horizontal_axis = True
 
 	# find upper
 	curr_row = first_black_pixel
