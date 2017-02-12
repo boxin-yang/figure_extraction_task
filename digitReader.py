@@ -1,6 +1,6 @@
-import numpy 
+import numpy
 
-is_debug_on = True
+is_debug_on = False
 error_return = -100000
 dollar_sign_return_value = -2
 negative_sign_return_value = -3
@@ -41,7 +41,7 @@ def read_digit_sequence(arr):
 	# Starting and ending column of a digit, reset to -1 after find a digit
 	starting_column = -1
 	ending_column = -1
-	
+
 	# Used to mark the - sign read
 	is_negative = False
 
@@ -60,7 +60,7 @@ def read_digit_sequence(arr):
 
 		if is_debug_on :
 			print("starting_column is ", starting_column)
-		
+
 		# no more digit
 		if (starting_column == -1):
 			break
@@ -96,16 +96,16 @@ def read_digit_sequence(arr):
 			if is_debug_on:
 				print("index of out bound error")
 			digit = error_return
-		
+
 		if (digit == error_return) :
 			return error_return
-		
+
 		if (digit == negative_sign_return_value):
 			is_negative = True
 		else:
 			if (digit != comma_return_value):
 				result.append(digit)
-		
+
 		# search for next digit
 		starting_column = -1
 		ending_column = -1
@@ -116,7 +116,7 @@ def read_digit_sequence(arr):
 		return error_return
 
 	final_result = 0
-	
+
 	if is_debug_on :
 		print("read_digit_sequence: adding up final result, count ", len(result))
 
@@ -369,8 +369,8 @@ def pixel_array_to_digit(arr):
 	background pixel. The function first identifies the left most pixel(using the
 	upper pixel if tied). Then the function compares the relative position of black
 	pixels to determine the digit the pixels is representing. If the function cannot
-	determine the digit, error_return will be returned to indicate error. 
-	
+	determine the digit, error_return will be returned to indicate error.
+
 	Args:
 	arr (int): The 2D numpy array to represent the pixel values.
 	arr[row][column] is the pixel values at that row and column
@@ -405,7 +405,7 @@ def pixel_array_to_digit(arr):
 
 			if left_most_x != -1:
 				break
-	
+
 		if left_most_y != -1:
 			break
 
@@ -417,7 +417,7 @@ def pixel_array_to_digit(arr):
 
 	if is_debug_on:
 		print("left_most_x, left_most_y", left_most_x, left_most_y)
-	
+
 	# Test for - sign
 	# TODO: think of a better way to place the code
 	if(arr.shape[1] - left_most_y > 2
@@ -426,15 +426,15 @@ def pixel_array_to_digit(arr):
 		if (arr.shape[0] - left_most_x < 2
 		    or arr[left_most_x + 2][left_most_y + 2] == 0):
 			return negative_sign_return_value
-	
+
 	if is_debug_on:
 		print("not - sign")
 
 	# Test for "," mark
-	if(left_most_x > 0 
+	if(left_most_x > 0
 	   and arr[left_most_x - 1][left_most_y + 1] == 1):
 		if(arr.shape[1] - left_most_y < 3
-		   or (arr[left_most_x - 1][left_most_y + 2] == 0 
+		   or (arr[left_most_x - 1][left_most_y + 2] == 0
 		       and arr[left_most_x][left_most_y + 1] == 0
 		       and arr[left_most_x][left_most_y + 2] == 0)):
 			return comma_return_value
@@ -454,7 +454,7 @@ def pixel_array_to_digit(arr):
 		    and arr[left_most_x - 1][left_most_y + 4] == 1
 		    and arr[left_most_x][left_most_y + 2] == 1
 		    and arr[left_most_x][left_most_y + 3] == 1):
-		print("here")
+		#print("here")
 		return 0
 
 	if is_debug_on:
@@ -463,7 +463,7 @@ def pixel_array_to_digit(arr):
 
 	# A valid digit or $ pixel has at least 5 rows, 2 coloums
 	# Quite test for wrong orientation
-	if (arr.shape[1] - left_most_y < 2 or arr.shape[0] - left_most_x < 5) :
+	if (arr.shape[1] - left_most_y < 2 or arr.shape[0] - left_most_x < 4) :
 		# print("pixel_array_to_digit with param ", arr, ": invalid input dimensions")
 		return error_return
 
@@ -507,7 +507,7 @@ def pixel_array_to_digit(arr):
 		# {1,2,3,5,7,pound,R}
 		if (left_most_x > 0 and arr[left_most_x - 1][left_most_y + 1] == 1):
 			return verify_digit_pixels(arr, pound_return_value, left_most_x, left_most_y)
-		
+
 		if (arr[left_most_x + 4][left_most_y] == 0):
 			# {1,7}
 			if (arr[left_most_x + 1][left_most_y + 1] == 0):
@@ -530,9 +530,3 @@ def pixel_array_to_digit(arr):
 					return verify_digit_pixels(arr, 5, left_most_x, left_most_y)
 				else :
 					return verify_digit_pixels(arr, letter_r_return_value, left_most_x, left_most_y)
-
-
-
-
-
-

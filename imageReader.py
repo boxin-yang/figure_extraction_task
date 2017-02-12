@@ -2,8 +2,10 @@ import numpy
 from PIL import Image
 from digitReader import read_digit_sequence
 
-is_debug_on = True
+is_debug_on = False
 error_return = -100000
+error_return_long = -110000
+error_return_left = -100100
 
 def is_a_digit_pixel(black_pixel_value, val):
 	if (black_pixel_value == 0):
@@ -12,21 +14,24 @@ def is_a_digit_pixel(black_pixel_value, val):
 		return val <= 114
 
 def is_a_horizontal_axis_pixel(val):
-	return (val == 0) or (val == 11) or (val == 20)
+	return (val == 0) or (val == 4) or (val == 8) or (val == 11) or (val == 20) or (val==31)
 
 def is_a_pixel_to_indicate_column_under_horizontal_axis(val):
-	return (val == 0) or (val == 9)
+	return (val == 0) or (val <= 10)
 
 def read_image(image_name):
 	'''This function reads a graph plot.
 
 	'''
-	
+
 	# Load the image
-	im = Image.open(image_name)
+	try:
+		im = Image.open(image_name)
+	except:
+		return "OPEN"
 	im = im.convert("L")
 	pixels = im.load()
-	
+
 	if is_debug_on:
 		print("read_image is called with file name ", image_name)
 		print("dimension", im.size)
@@ -39,12 +44,14 @@ def read_image(image_name):
 	vertical_axis = -1
 
 	while(current_column < im.size[0] and vertical_axis == -1):
-		if (pixels[current_column, middle_row] != 0) :
+		#print pixels[current_column, middle_row]
+		if (pixels[current_column, middle_row] > 80) :
 			current_column += 1
 			continue
 
 		black_pixel_count = 0
 		for x in range(-30, 30):
+			#print pixels[current_column, middle_row + x]
 			if (pixels[current_column, middle_row + x] == 0):
 				black_pixel_count += 1
 
@@ -53,7 +60,7 @@ def read_image(image_name):
 			vertical_axis = current_column
 		else :
 			current_column += 1
-	
+
 	if is_debug_on:
 		print("vertical axis is at ", vertical_axis)
 
@@ -62,13 +69,84 @@ def read_image(image_name):
 	horizontal_axis = -1
 
 	while(current_row > 0 and horizontal_axis == -1):
-		if not is_a_horizontal_axis_pixel(pixels[middle_coloum, current_row]) :
+		not_found = 1
+		#print pixels[middle_coloum, current_row]
+		#print pixels[middle_coloum - 100, current_row]
+		#print pixels[middle_coloum + 100, current_row]
+		#print "---"
+		if is_a_horizontal_axis_pixel(pixels[middle_coloum, current_row]):
+			not_found = 0
+			center_column = middle_coloum
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 10, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 10
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 20, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 20
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 30, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 30
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 40, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 40
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 50, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 50
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 60, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 60
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 70, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 70
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 80, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 80
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 90, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 90
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum - 100, current_row]):
+			not_found = 0
+			center_column = middle_coloum - 100
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 10, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 10
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 20, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 20
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 30, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 30
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 40, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 40
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 50, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 50
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 60, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 60
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 70, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 70
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 80, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 80
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 90, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 90
+		elif is_a_horizontal_axis_pixel(pixels[middle_coloum + 100, current_row]):
+			not_found = 0
+			center_column = middle_coloum + 100
+
+
+		if not_found == 1:
 			current_row -= 1
 			continue
 
+
 		black_pixel_count = 0
-		for x in range(-30, 30):
-			if is_a_horizontal_axis_pixel(pixels[middle_coloum + x, current_row]):
+		for x in range(-100, 100):
+			if is_a_horizontal_axis_pixel(pixels[center_column + x, current_row]):
 				black_pixel_count += 1
 
 		if (black_pixel_count > 50) :
@@ -76,7 +154,7 @@ def read_image(image_name):
 			horizontal_axis = current_row
 		else :
 			current_row -= 1
-	
+
 	if is_debug_on:
 		print("horizontal axis is at ", horizontal_axis)
 
@@ -89,28 +167,29 @@ def read_image(image_name):
 	current_column = vertical_axis
 
 	graph_columns = []
-	
+
 	while (current_column < im.size[0]):
+		#print pixels[current_column, horizontal_axis + 1]
 		if is_a_pixel_to_indicate_column_under_horizontal_axis(pixels[current_column, horizontal_axis + 1]):
 			graph_columns.append(current_column)
 
 		current_column += 1
-	
+
 	if is_debug_on:
 		print("found following number of columns in the graph ", len(graph_columns))
 
 	# column_distance is used in read_column to avoid unexpected reading beyond column
 	if (len(graph_columns) > 1):
-		column_distance = graph_columns[1] - graph_columns[0] 
+		column_distance = graph_columns[1] - graph_columns[0]
 	else :
 		column_distance = graph_columns[0] - vertical_axis
-	
+
 	if is_debug_on:
 		print(graph_columns)
 		print("column distance is", column_distance)
-	
+
 	graph_data = []
-	
+
 	has_error = False
 	pos = 0
 
@@ -125,7 +204,7 @@ def read_image(image_name):
 
 	if has_error:
 		print("Error: pixel_array_to_digit returns error_return")
-	
+
 	if is_debug_on :
 		print(image_name, "Data read for each column is (column, data)")
 		for x in range (len(graph_data)):
@@ -140,7 +219,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	'''
 	if is_debug_on:
 		print("read_column called with param: col, column_distance, horizontal_axis, vertical_axis", col, column_distance, horizontal_axis, vertical_axis)
-	
+
 	# Find the first black pixel above the vertical axis
 	# Start searching 3 pixels above the axis to avoid searching axis label
 	# search black pixels first
@@ -196,7 +275,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 	# if no dark pixels detected
 	if (first_black_pixel == -1):
 		return 0
-	
+
 	if is_debug_on:
 		print("read_column: first_black_pixel found is at row", first_black_pixel, "black pixel value is", black_pixel_value)
 
@@ -208,13 +287,13 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 
 	# Some axis has unwanted black pixels above horizontal axis(e.g. sample4.tiff)
 	need_to_prune_pixels_above_horizontal_axis = False
-
+	#print pixels[col, horizontal_axis - 2]
 	# if first black pixel is close to horizontal axis, just take horizontal_axis - 1 as the lower bound
 	if (horizontal_axis - first_black_pixel < 12):
 		lower = horizontal_axis - 1
 
 		# bizzare behavior in test9.png, where a black pixel is 2 rows above the horizontal axis
-		if (pixels[col, horizontal_axis - 2] == 0
+		if (pixels[col, horizontal_axis - 2] <= 114
 		    and not (is_a_digit_pixel(black_pixel_value, pixels[col - 1, horizontal_axis - 2])
 		      or is_a_digit_pixel(black_pixel_value, pixels[col + 1, horizontal_axis - 2])
 		      or is_a_digit_pixel(black_pixel_value, pixels[col - 1, horizontal_axis - 3])
@@ -265,6 +344,9 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 3])
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 4])
 			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 5])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 6])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 7])
+			or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row - 8])
 			or is_a_digit_pixel(black_pixel_value, pixels[col + 1, curr_row - 1])
 			or is_a_digit_pixel(black_pixel_value, pixels[col + 2, curr_row - 1])
 			or is_a_digit_pixel(black_pixel_value, pixels[col - 1, curr_row - 1])
@@ -312,7 +394,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 					or is_a_digit_pixel(black_pixel_value, pixels[col + 6, curr_row])):
 					curr_row += 1
 					continue
-			
+
 			# If the column has more black pixel, not finished yet
 			if (is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 1])
 				or is_a_digit_pixel(black_pixel_value, pixels[col, curr_row + 2])
@@ -332,7 +414,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 
 			lower = curr_row
 			break
-	
+
 	if (lower == -1):
 		if is_debug_on:
 			print("lower reading is -1")
@@ -363,13 +445,13 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 					if (is_a_digit_pixel(black_pixel_value, pixels[curr_column - x, y])):
 						has_no_black_pixel = False
 						break
-					
+
 			if has_no_black_pixel:
 				left = curr_column
 				break
 			else:
 				curr_column -= 1
-		
+
 	# find right
 	curr_column = col + 1
 	while (curr_column - col < column_distance) :
@@ -388,24 +470,27 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 				if (is_a_digit_pixel(black_pixel_value, pixels[curr_column + x, y])):
 					has_no_black_pixel = False
 					break
-				
+
 		if has_no_black_pixel:
 			right = curr_column
 			break
 		else:
 			curr_column += 1
-	
+
 	if is_debug_on:
 		print("read_column finds the crop (left, upper, right, lower)",left, upper, right, lower)
 
+	if (left == -1 and right == -1):
+		return error_return_long
+
 	if (left == -1 or right == -1):
-		return error_return
+		return error_return_left
 
 	# if cropping goes to another column, high chance of reading overlap
 	if (col - left >= column_distance or right - col >= column_distance):
 		print("Error: reading overlaps with another column")
 		return error_return
-	
+
 	pixels_arr = numpy.zeros((lower - upper + 1, right - left + 1))
 
 	for x in range (pixels_arr.shape[0]):
@@ -419,7 +504,7 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 		pixels_arr[pixels_arr.shape[0] - 2][col - left] = 0
 
 	try_with_original_pixel = read_digit_sequence(pixels_arr)
-	
+
 	if(try_with_original_pixel !=error_return):
 		return try_with_original_pixel
 
@@ -433,15 +518,6 @@ def read_column(col, column_distance, horizontal_axis, vertical_axis, pixels):
 		for y in range(pixels_arr.shape[1]):
 			if(pixels_arr[x][y] == 1):
 				pixels_arr_rotate[y][height - x] = 1
-	
+
 	try_with_rotated_pixel = read_digit_sequence(pixels_arr_rotate)
 	return try_with_rotated_pixel
-
-
-
-
-
-
-
-
-
